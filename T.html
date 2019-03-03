@@ -1,0 +1,84 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <script
+      type="text/javascript"
+      src="scripts/all.compatible.js?v=2019012001"
+    ></script>
+    <meta
+      name="viewport"
+      content="initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width"
+    />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="format-detection" content="email=no" />
+    <meta name="format-detection" content="address=no;" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>
+      测试
+    </title>
+    <!-- css end-->
+    <!-- js end -->
+    <script
+      type="text/javascript"
+      src="scripts/ui.datepicker-zh-CN.js?v=2017031901"
+    ></script>
+    <script
+      type="text/javascript"
+      src="scripts/jquery-ui-1.10.4.custom.js?v=2017031901"
+    ></script>
+    <script
+      type="text/javascript"
+      src="scripts/jquery.mobile.datepicker.js"
+    ></script>
+    <link
+      href="css/ui-lightness/jquery-ui-1.10.4.custom.css?v=2017031901"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <!-- <link href="css/jquery.mobile.datepicker.css" rel="stylesheet" type="text/css" /> -->
+    <style>
+      .ui-datepicker td a {
+        padding: 0.2em 0.2em 1.1em 0.2em !important;
+      }
+
+      .ui-datepicker .weekend .ui-state-default {
+        background: #fea;
+      }
+      .extra {
+        height: 0;
+        font-size: 10px;
+        padding: 0 !important;
+        color: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="body_div">
+      <span>试教时间:</span>
+      <input
+        name="TextBoxTryTeachingDate"
+        type="text"
+        id="TextBoxTryTeachingDate"
+        class="inp_txt suojin iconbg icon_date"
+      />
+    </div>
+
+    <script language="javascript" type="text/javascript">
+      initAddDate()
+
+      function initAddDate() {
+        $('#TextBoxTryTeachingDate').datepicker({
+          changeMonth: true,
+          changeYear: true,
+          yearRange: '-50:+5',
+          showButtonPanel: true,
+          numberOfMonths: 1,
+          showBusinessInfo: true, // true表示要显示附加信息
+          url: '/http/Info4Calendar'
+        })
+      }
+    </script>
+  </body>
+</html>
