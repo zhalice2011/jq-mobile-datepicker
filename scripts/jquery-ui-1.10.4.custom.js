@@ -6348,7 +6348,10 @@ $.extend(Datepicker.prototype, {
                     for(var i = drawMonth; i < 12 ; i++) {
                         AllTbody += this._generateTbodyHTML(inst, i)
                     }
-                    console.log('AllTbody, ', AllTbody)
+                    // 修改datapicker的高度,自适应屏幕高度
+                    var container = document.getElementById(this._mainDivId)
+                    container.style.overflow = 'auto';
+                    container.style.maxHeight = '308px';
                 }
                 calender += "</tbody>" + AllTbody +"</table>" + (isMultiMonth ? "</div>" +
                             ((numMonths[0] > 0 && col === numMonths[1]-1) ? "<div class='ui-datepicker-row-break'></div>" : "") : "");
