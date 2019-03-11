@@ -5324,11 +5324,15 @@ $.extend(Datepicker.prototype, {
         var showBusinessInfo = this._get(inst, 'showBusinessInfo')
 		var _this = this
         if (showBusinessInfo) {
-            var url = this._get(inst, "url");
+			var url = this._get(inst, "url");
+			var isMobile = this._get(inst, "isMobile");
             var year = inst.drawYear;
             var month = inst.drawMonth + 1;
-            var numberOfMonths = this._get(inst, "numberOfMonths");
-            var currentUrl = url + '?year=' + year +'&month='+ month + '&numberOfMonths=' + numberOfMonths
+			var numberOfMonths = this._get(inst, "numberOfMonths");
+			if (isMobile) {
+				numberOfMonths = 12 - month + 1;
+			}
+			var currentUrl = url + '?year=' + year +'&month='+ month + '&numberOfMonths=' + numberOfMonths
             $.ajax({
                 type: "get",
                 dataType: "json",
@@ -6463,7 +6467,7 @@ $.extend(Datepicker.prototype, {
                     }
                     calender += "'>";
                 }
-                calender +=  "<tbody>" + "<tr><td colspan='7'><div style='text-align: center;'>" + drawYear + '年'+ monthNames[drawMonth] + "</div></td></tr>"
+                calender +=  "<tbody>" + "<tr><td colspan='7'><div style='text-align: center; padding: 8px 0;'>" + drawYear + '年'+ monthNames[drawMonth] + "</div></td></tr>"
                 daysInMonth = this._getDaysInMonth(drawYear, drawMonth);
                 if (drawYear === inst.selectedYear && drawMonth === inst.selectedMonth) {
                     inst.selectedDay = Math.min(inst.selectedDay, daysInMonth);
@@ -6793,7 +6797,7 @@ $.fn.datepicker = function(options){
     }
 
     /* check isMobile. dali*/
-    options.isMobile = mobilecheck()
+	options.isMobile = mobilecheck()
 
 	/* Initialise the date picker. */
 	if (!$.datepicker.initialized) {
