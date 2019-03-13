@@ -5326,11 +5326,12 @@ $.extend(Datepicker.prototype, {
         if (showBusinessInfo) {
 			var url = this._get(inst, "url");
 			var isMobile = this._get(inst, "isMobile");
+			var isScroll = this._get(inst, "isScroll");
             var year = inst.drawYear;
             var month = inst.drawMonth + 1;
 			var numberOfMonths = this._get(inst, "numberOfMonths");
 			if (isMobile) {
-				numberOfMonths = 12 - month + 1;
+				numberOfMonths = 2;
 			}
 			var currentUrl = url + '?year=' + year +'&month='+ month + '&numberOfMonths=' + numberOfMonths
             $.ajax({
@@ -5338,7 +5339,12 @@ $.extend(Datepicker.prototype, {
                 dataType: "json",
                 url: currentUrl,  //这里是网址
                 success: function (data) {
-                    inst.settings.list =  data.list
+					if (isMobile&& isScroll) {
+                        $.datepicker.list[year+month] = data.list
+						inst.settings.list = inst.settings.list.concat(data.list)
+					} else {
+						inst.settings.list =  data.list
+					}
                     _this.__updateDatepickerPre(inst)
                 },
                 timeout: 1000,
@@ -6348,8 +6354,10 @@ $.extend(Datepicker.prototype, {
                 }
                 var AllTbody = ''
                 if (isMobile) {
-                    // 获取当前的月份, 获取当前的年 // 当前是3月 那么就从3月开始一直到12月 // 获取每一个tobody
-                    for(var i = drawMonth; i < 12 ; i++) {
+					// 获取当前的月份, 获取当前的年 // 当前是3月 那么就从3月开始一直到12月 // 获取每一个tobody
+					// 最多获取2个月
+					monthLen = (drawMonth + 1) > 12 ? 12 : drawMonth + 1
+                    for(var i = drawMonth; i < monthLen ; i++) {
                         AllTbody += this._generateTbodyHTML(inst, i)
                     }
                     // 修改datapicker的高度,自适应屏幕高度
@@ -6797,7 +6805,10 @@ $.fn.datepicker = function(options){
     }
 
     /* check isMobile. dali*/
-	options.isMobile = mobilecheck()
+    options.isMobile = mobilecheck()
+
+    /* save the interface data dali*/
+    $.datepicker.list = {}
 
 	/* Initialise the date picker. */
 	if (!$.datepicker.initialized) {
@@ -6808,6 +6819,42 @@ $.fn.datepicker = function(options){
 	/* Append datepicker main container to body if not exist. */
 	if ($("#"+$.datepicker._mainDivId).length === 0) {
 		$("body").append($.datepicker.dpDiv);
+	}
+	/* Listen for scrolling events dali*/
+	if (options.isMobile) {
+        var _this = $.datepicker;
+        var t=0,p=0;
+		$("#ui-datepicker-div").scroll(function(e) {
+            var p = this.scrollTop
+            if(t<=p){ //下滚
+                if(this.scrollTop + 320 >= this.scrollHeight) { // 1. 往下滚滚动到底
+                    const month = _this._curInst.drawMonth + 2 // > 12 ? 12 : _this._curInst.drawMonth + 2
+                    console.log('month', month)
+                    if (month > 12 ) {
+                        _this._curInst.drawMonth = 1
+                        _this._curInst.drawYear += 1
+                    } else {
+                        _this._curInst.drawMonth = month
+                    }
+                    _this._updateDatepicker(_this._curInst)
+                    this.scrollTop = 0
+                }
+            }else{ //上滚
+                if (this.scrollTop === 0) {
+                    const month = _this._curInst.drawMonth - 2 // > 12 ? 12 : _this._curInst.drawMonth + 2
+                    console.log('month', month)
+                    if (month < 1 ) {
+                        _this._curInst.drawMonth = 12
+                        _this._curInst.drawYear -= 1
+                    } else {
+                        _this._curInst.drawMonth = month
+                    }
+                    _this._updateDatepicker(_this._curInst)
+                    this.scrollTop = 0
+                }
+            }
+            setTimeout(function(){t = p;},0);
+		});
 	}
 
 	var otherArgs = Array.prototype.slice.call(arguments, 1);
