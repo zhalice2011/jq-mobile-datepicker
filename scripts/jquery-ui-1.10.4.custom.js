@@ -5326,21 +5326,31 @@ $.extend(Datepicker.prototype, {
         if (showBusinessInfo) {
 			var url = this._get(inst, "url");
 			var isMobile = this._get(inst, "isMobile");
-			var isScroll = this._get(inst, "isScroll");
+			var endMonth = this._get(inst, "endMonth");
             var year = inst.drawYear;
             var month = inst.drawMonth + 1;
 			var numberOfMonths = this._get(inst, "numberOfMonths");
 			if (isMobile) {
-				numberOfMonths = 2;
+				if (endMonth) {
+					month = endMonth + 1
+					numberOfMonths = 1;
+				} else {
+					numberOfMonths = 2;
+				}
 			}
 			var currentUrl = url + '?year=' + year +'&month='+ month + '&numberOfMonths=' + numberOfMonths
+			const key = year+''+month
+			if ($.datepicker.list[key]) {
+				_this.__updateDatepickerPre(inst)
+				return
+			}
             $.ajax({
                 type: "get",
                 dataType: "json",
                 url: currentUrl,  //这里是网址
                 success: function (data) {
-					if (isMobile&& isScroll) {
-                        $.datepicker.list[year+month] = data.list
+					if (isMobile) {
+                        $.datepicker.list[key] = true
 						inst.settings.list = inst.settings.list.concat(data.list)
 					} else {
 						inst.settings.list =  data.list
@@ -6203,7 +6213,6 @@ $.extend(Datepicker.prototype, {
 			maxDate = this._getMinMaxDate(inst, "max"),
 			drawMonth = inst.drawMonth - showCurrentAtPos,
             drawYear = inst.drawYear;
-        console.log('hideIfNoPrevNext', hideIfNoPrevNext)
 		if (drawMonth < 0) {
 			drawMonth += 12;
 			drawYear--;
@@ -6357,12 +6366,10 @@ $.extend(Datepicker.prototype, {
                 if (isMobile) {
 					// 获取当前的月份, 获取当前的年 // 当前是3月 那么就从3月开始一直到12月 // 获取每一个tobody
 					// 最多获取2个月
-					// endMonth
 					monthLen = endMonth ? (endMonth + 1) : ((drawMonth + 1) > 12 ? 12 : drawMonth + 1)
                     for(var i = drawMonth; i < monthLen ; i++) {
                         AllTbody += this._generateTbodyHTML(inst, i)
 					}
-					debugger
                     // 修改datapicker的高度,自适应屏幕高度
                     var container = document.getElementById(this._mainDivId)
                     container.style.overflow = 'auto';
@@ -6829,14 +6836,11 @@ $.fn.datepicker = function(options){
         var t=0,p=0;
 		$("#ui-datepicker-div").scroll(function(e) {
 			var p = this.scrollTop
-			console.log('this.scrollTop', this.scrollTop)
 			if(t<=p){ //下滚
-				console.log('this.scrollHeight - this.scrollTop', this.scrollHeight - this.scrollTop - this.offsetHeight)
 				// 如果滚动到距离底部只有10了
 				let fanye = false
 				if ((this.scrollHeight - this.scrollTop - this.offsetHeight) < 20) {
 					const month = _this._curInst.drawMonth + 2 // > 12 ? 12 : _this._curInst.drawMonth + 2
-					console.log('_this._curInst.settings.endMonth', _this._curInst.settings.endMonth)
                     if (month > 12 || _this._curInst.settings.endMonth > 10) {
                         _this._curInst.drawMonth = 0
 						_this._curInst.drawYear += 1
@@ -6856,12 +6860,13 @@ $.fn.datepicker = function(options){
 				}
             }else{ //上滚
                 if (this.scrollTop === 0) {
-                    const month = _this._curInst.drawMonth - 1
-                    if (month < 1 ) {
-                        _this._curInst.drawMonth = 12
-                        _this._curInst.drawYear -= 1
+					const month = _this._curInst.drawMonth - 1
+                    if (month < 0 ) {
+                        _this._curInst.drawMonth = 0
+						_this._curInst.drawYear -= 1
+						_this._curInst.settings.endMonth = 2
                     } else {
-                        _this._curInst.drawMonth = month
+						_this._curInst.drawMonth = month
                     }
                     _this._updateDatepicker(_this._curInst)
                     this.scrollTop = 0
