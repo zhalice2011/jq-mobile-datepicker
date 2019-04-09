@@ -5339,7 +5339,7 @@ $.extend(Datepicker.prototype, {
 				}
 			}
 			var currentUrl = url + '?year=' + year +'&month='+ month + '&numberOfMonths=' + numberOfMonths
-			const key = year+''+month
+			var key = year+''+month
 			if ($.datepicker.list[key]) {
 				_this.__updateDatepickerPre(inst)
 				return
@@ -5360,9 +5360,19 @@ $.extend(Datepicker.prototype, {
                 },
                 timeout: 1000,
                 error: function (e) {
-                    inst.settings.list =  [
-                        { "date": "2019-02-22", "info": "" },
-                    ]
+					var m = month > 9 ? month : '0'+ month
+					var mockData =  {
+						list: [
+							{ "date": year+"-" + m + "-10", "info": key },
+						]
+					}
+					if (isMobile) {
+						$.datepicker.list[key] = true
+						inst.settings.list = inst.settings.list || []
+						inst.settings.list = inst.settings.list.concat(mockData.list)
+					} else {
+						inst.settings.list =  mockData.list
+					}
 					_this.__updateDatepickerPre(inst)
                 }
             });
@@ -6841,11 +6851,12 @@ $.fn.datepicker = function(options){
 				// 如果滚动到距离底部只有10了
 				let fanye = false
 				if ((this.scrollHeight - this.scrollTop - this.offsetHeight) < 20) {
-					const month = _this._curInst.drawMonth + 2 // > 12 ? 12 : _this._curInst.drawMonth + 2
-                    if (month > 12 || _this._curInst.settings.endMonth > 10) {
-                        _this._curInst.drawMonth = 0
+					const month = _this._curInst.drawMonth + 2
+					// if (month > 11 || _this._curInst.settings.endMonth > 10) { // 翻一年
+					if (_this._curInst.settings.endMonth > 10) { // 翻一年
+						_this._curInst.drawMonth = 0
 						_this._curInst.drawYear += 1
-						_this._curInst.settings.endMonth = 2
+						_this._curInst.settings.endMonth = undefined
 						fanye = true
                     } else {
 						if (_this._curInst.settings.endMonth) {
@@ -6865,7 +6876,7 @@ $.fn.datepicker = function(options){
                     if (month < 0 ) {
                         _this._curInst.drawMonth = 0
 						_this._curInst.drawYear -= 1
-						_this._curInst.settings.endMonth = 2
+						_this._curInst.settings.endMonth = undefined
                     } else {
 						_this._curInst.drawMonth = month
                     }
