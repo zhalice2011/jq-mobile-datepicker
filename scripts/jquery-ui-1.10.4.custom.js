@@ -5350,7 +5350,8 @@ $.extend(Datepicker.prototype, {
                 url: currentUrl,  //这里是网址
                 success: function (data) {
 					if (isMobile) {
-                        $.datepicker.list[key] = true
+						$.datepicker.list[key] = true
+						inst.settings.list = inst.settings.list || []
 						inst.settings.list = inst.settings.list.concat(data.list)
 					} else {
 						inst.settings.list =  data.list
