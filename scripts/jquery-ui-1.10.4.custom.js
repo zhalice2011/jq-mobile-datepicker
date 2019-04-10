@@ -5363,11 +5363,11 @@ $.extend(Datepicker.prototype, {
 					var m = month > 9 ? month : '0'+ month
 					var mockData =  {
 						list: [
-							{ "date": year+"-" + m + "-10", "info": key },
+							// { "date": year+"-" + m + "-10", "info": key },
 						]
 					}
 					if (isMobile) {
-						$.datepicker.list[key] = true
+						// $.datepicker.list[key] = true
 						inst.settings.list = inst.settings.list || []
 						inst.settings.list = inst.settings.list.concat(mockData.list)
 					} else {
@@ -6852,8 +6852,7 @@ $.fn.datepicker = function(options){
 				let fanye = false
 				if ((this.scrollHeight - this.scrollTop - this.offsetHeight) < 20) {
 					const month = _this._curInst.drawMonth + 2
-					// if (month > 11 || _this._curInst.settings.endMonth > 10) { // 翻一年
-					if (_this._curInst.settings.endMonth > 10) { // 翻一年
+					if (month > 12 || _this._curInst.settings.endMonth > 10) { // 翻一年
 						_this._curInst.drawMonth = 0
 						_this._curInst.drawYear += 1
 						_this._curInst.settings.endMonth = undefined
